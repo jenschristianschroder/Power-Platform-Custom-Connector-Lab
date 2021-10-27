@@ -48,7 +48,7 @@ namespace CompanyName.Weather
             } 
             // return weather forecast for location
             var jsonForecast = JsonConvert.SerializeObject(forecast);
-            return new OkObjectResult(jsonForecast);
+            return new OkObjectResult(forecast);
         }
     }
 
