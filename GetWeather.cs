@@ -9,6 +9,7 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace CompanyName.Weather
 {
@@ -30,12 +31,32 @@ namespace CompanyName.Weather
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name = name ?? data?.name;
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-            return new OkObjectResult(responseMessage);
+            // Weather Forecast Object
+            weatherForecast weatherForecastObject = new weatherForecast();
+            weatherForecastObject.locations = new List<location> {
+                new location { locationName = "Bergen", forecast = "Rain" },
+                new location { locationName = "Oslo", forecast = "Cloudy" },
+                new location { locationName = "Stavanger", forecast = "Sunny" }
+            };
+            
+            // Find location matching querystring parameter name
+            var forecast = weatherForecastObject.locations.Find(x => x.locationName.ToLower() == name.ToLower());
+            
+            // if location matching querystring parameter name is not found return error message 
+            if(forecast == null) {
+                forecast = new location { locationName = name, forecast = $"Location '{name}' not found" };
+            } 
+            // return weather forecast for location
+            var jsonForecast = JsonConvert.SerializeObject(forecast);
+            return new OkObjectResult(jsonForecast);
         }
     }
-}
 
+    public class weatherForecast {
+        public List<location> locations { get; set; }
+    }
+    public class location {
+        public string locationName { get; set; }
+        public string forecast { get; set; }
+    }
+}
