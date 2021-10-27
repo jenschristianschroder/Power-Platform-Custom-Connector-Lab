@@ -47,7 +47,6 @@ namespace CompanyName.Weather
                 forecast = new location { locationName = name, forecast = $"Location '{name}' not found" };
             } 
             // return weather forecast for location
-            var jsonForecast = JsonConvert.SerializeObject(forecast);
             return new OkObjectResult(forecast);
         }
     }
